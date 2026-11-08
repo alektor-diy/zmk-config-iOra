@@ -1,0 +1,22 @@
+if SHIELD_SylvaTwin_L
+    config ZMK_KEYBOARD_NAME
+        default "SylvaTwin_L"
+    
+    config ZMK_SPLIT_ROLE_CENTRAL
+        default y
+
+    config ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS
+        default 1
+
+    config ZMK_SPLIT
+        default y
+endif
+
+if SHIELD_SylvaTwin_R
+
+    config ZMK_KEYBOARD_NAME
+        default "SylvaTwin_R"
+        
+    config ZMK_SPLIT
+        default y
+endif
