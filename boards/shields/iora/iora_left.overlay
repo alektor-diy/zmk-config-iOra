@@ -3,6 +3,12 @@
 #include "iora.dtsi"
 
 / {
+    iora_auto_mouse: iora-auto-mouse {
+        compatible = "askey,auto-mouse";
+        #input-processor-cells = <0>;
+        processor = <&zip_temp_layer 4 800>;
+    };
+
     left_trackball_listener: left-trackball-listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
@@ -14,6 +20,7 @@
     right_trackball_listener: right-trackball-listener {
         compatible = "zmk,input-listener";
         device = <&right_trackball_split>;
+        input-processors = <&iora_auto_mouse>;
 
         scroll {
             layers = <1 2>;
@@ -22,6 +29,11 @@
                                <&zip_xy_to_scroll_mapper>;
         };
     };
+};
+
+&zip_temp_layer {
+    require-prior-idle-ms = <200>;
+    excluded-positions = <39 40 41>; /* Del, Space, F7 */
 };
 
 &trackball {

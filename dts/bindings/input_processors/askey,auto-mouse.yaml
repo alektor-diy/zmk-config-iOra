@@ -1,0 +1,10 @@
+description: Gate the iOra automatic mouse layer on its user toggle
+compatible: "askey,auto-mouse"
+include: ip_zero_param.yaml
+
+properties:
+  processor:
+    type: phandle-array
+    specifier-space: input-processor
+    required: true
+    description: Temporary layer input processor with its layer and timeout parameters
