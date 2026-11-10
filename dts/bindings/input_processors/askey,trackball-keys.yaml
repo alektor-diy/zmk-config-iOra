@@ -1,0 +1,25 @@
+description: Convert vertical trackball motion to keys from a Studio-editable layer
+compatible: "askey,trackball-keys"
+include: ip_zero_param.yaml
+
+properties:
+  layers:
+    type: array
+    required: true
+  settings-layer:
+    type: int
+    required: true
+  up-positions:
+    type: array
+    required: true
+    description: One upward binding position per entry in layers
+  down-positions:
+    type: array
+    required: true
+    description: One downward binding position per entry in layers
+  counts-per-tap:
+    type: int
+    required: true
+  repeat-interval-ms:
+    type: int
+    required: true

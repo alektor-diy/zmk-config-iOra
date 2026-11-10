@@ -74,10 +74,9 @@ static int on_layer_state_changed(const zmk_event_t *event) {
         return ZMK_EV_EVENT_BUBBLE;
     }
 
-    // Scroll layers take priority, including when an activation was already queued.
-    if (change->layer == 1 || change->layer == 2 ||
-        (change->layer == MOUSE_LAYER && (atomic_get(&auto_mouse_disabled) ||
-                                         zmk_keymap_layer_active(1) || zmk_keymap_layer_active(2)))) {
+    // Clear the prior mouse layer on entry so the new layer starts with its own keys.
+    if ((change->layer >= 1 && change->layer <= 3) ||
+        (change->layer == MOUSE_LAYER && atomic_get(&auto_mouse_disabled))) {
         zmk_keymap_layer_deactivate(MOUSE_LAYER);
     }
     return ZMK_EV_EVENT_BUBBLE;
@@ -92,7 +91,12 @@ static int control_pressed(struct zmk_behavior_binding *binding,
     const struct zmk_behavior_binding *fallback = device->config;
 
     if (fallback) {
-        zmk_keymap_layer_deactivate(MOUSE_LAYER);
+        if (event.layer == MOUSE_LAYER) {
+            zmk_keymap_layer_deactivate(MOUSE_LAYER);
+            // Record the underlying layer for both this press and the physical release.
+            return zmk_keymap_position_state_changed(event.source, event.position, true,
+                                                    event.timestamp);
+        }
         return zmk_behavior_invoke_binding(fallback, event, true);
     }
     const uint8_t disabled = !atomic_xor(&auto_mouse_disabled, 1);

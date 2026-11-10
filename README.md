@@ -30,6 +30,14 @@ iOraは左右にトラックボールを備えた48キーの分割キーボー�
 
 Studioで保存したキーやレイヤー名は、通常のFW更新後も優先されます。**Restore Stock Settings** を使うとStudioで保存した変更を消去し、書き込んだFWのキーマップに戻せます。[ZMKの設定保存](https://zmk.dev/docs/config/settings)
 
+### 左トラックボールにキーを割り当てる
+
+1. Studioで **Trackball Settings**（L5）を開きます。
+2. L1は最上段、L2は2段目、L3は3段目の左端2枠を編集します。左端が上方向、その右隣が下方向です。**Key Press** から好きなキーコードを選びます。初期値はどの段も音量アップ・ダウンです。
+3. **Save** を押します。L1・L2・L3で左ボールを転がすと、そのレイヤーに対応するキーが入力されます。無効にしたい方向は **None** にします。複数が有効なときは、優先順位が最も高いレイヤーの設定を使います。
+
+![L5の設定枠。最上段がL1、2段目がL2、3段目がL3。各段の左端が上方向、右隣が下方向](docs/images/layer-5.svg)
+
 ## 設定ファイルで動作を変更する
 
 コンボの追加やタイミング、トラックボールの感度などは設定ファイルで変更し、FWを再ビルドします。
@@ -40,6 +48,7 @@ Studioで保存したキーやレイヤー名は、通常のFW更新後も優先
 | 同時押し（コンボ） | [config/iora.keymap](config/iora.keymap) | `combos` の `key-positions`、`bindings`、`layers`、`timeout-ms` を編集します。位置番号は左上を0とし、各段を左から右へ12個ずつ数えます。 |
 | オートマウスのON/OFFキー | [config/iora.keymap](config/iora.keymap) | `&auto_mouse_toggle` を移します。初期位置はL1の左下（通常は左Ctrl）です。切り替えた状態は左手側に保存されます。 |
 | オートマウスの解除時間・入力直後の待機時間 | [iora_left.overlay](boards/shields/iora/iora_left.overlay) | `processor = <&zip_temp_layer 4 800>` の最後が解除までの時間、`require-prior-idle-ms = <200>` がキー入力直後の待機時間です。単位はmsです。 |
+| 左ボールのキー入力の感度・連続入力間隔 | [iora_left.overlay](boards/shields/iora/iora_left.overlay) | `counts-per-tap = <48>` を小さくすると短い移動で反応します。`repeat-interval-ms = <40>` は連続入力の最短間隔です。 |
 | スクロールの速さ | [iora_left.overlay](boards/shields/iora/iora_left.overlay) | 左用と右用の `zip_xy_scaler 1 16` を個別に調整します。分母を小さくすると速く、大きくすると遅くなります。 |
 | トラックボールのセンサー感度 | [iora.dtsi](boards/shields/iora/iora.dtsi) | `cpi = <800>` を変更します。左右共通の設定なので、変更後は両側のFWを書き込みます。 |
 | ディープスリープまでの時間 | [config/iora.conf](config/iora.conf) | `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000` のように追記します。初期値は900,000 ms（15分）です。変更後は両側のFWを書き込みます。 |
