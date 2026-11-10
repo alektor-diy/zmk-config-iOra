@@ -64,8 +64,8 @@
 ## ヒアリングで確認した構成
 
 - 初回FWから左右両方のトラックボールを有効にする。センサーは両側とも PixArt PMW3610。左右のXIAOがそれぞれ自側のセンサーを読み取る。
-- トラックボールの初期割り当ては、右手側がマウスカーソル移動、左手側が縦・横スクロール。左はベースレイヤーからスクロールとして使えるようにする。
-- 左のスクロールでは、取り付け向きに応じて正規化したX/Yに対し、Y反転（`INPUT_TRANSFORM_Y_INVERT`）、両軸の1/16スケーリング（`zip_xy_scaler 1 16`）、Xを横ホイール・Yを縦ホイールに変換（`zip_xy_to_scroll_mapper`）の順に処理する。左センサーの初期解像度は800 CPIとする。[ZMKの入力コード変換](https://zmk.dev/docs/keymaps/input-processors/code-mapper)
+- 左手側は全レイヤーで縦・横スクロール。右手側はレイヤー1（Numbers）または2（Function）が有効な間は縦・横スクロール、それ以外はマウスカーソル移動に使う。
+- 左右のセンサーは、取り付け向きに合わせてX/Yを入れ替え、両軸を反転する。スクロールでは、補正したX/Yに対し、Y反転（`INPUT_TRANSFORM_Y_INVERT`）、両軸の1/16スケーリング（`zip_xy_scaler 1 16`）、Xを横ホイール・Yを縦ホイールに変換（`zip_xy_to_scroll_mapper`）の順に処理する。左センサーの初期解像度は800 CPIとする。[ZMKの入力コード変換](https://zmk.dev/docs/keymaps/input-processors/code-mapper)
 - 右のカーソル操作は800 CPI、X/Yの倍率1:1を初期値とする。感度の微調整は実機確認後に行う。
 - 左手側をcentral、右手側をperipheralとする。左のトラックボールはcentralのローカル入力、右はperipheralから `zmk,input-split` 経由で受け取り、左から両方の入力をホストへ送る。[ZMK v0.3のポインティングデバイス実装ガイド](https://v0-3-branch.zmk.dev/docs/development/hardware-integration/pointing)
 - 左右の基板間はBLEで接続する。

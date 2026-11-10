@@ -7,3 +7,8 @@
 &right_trackball_split {
     device = <&trackball>;
 };
+
+&trackball {
+    x-invert;
+    y-invert;
+};

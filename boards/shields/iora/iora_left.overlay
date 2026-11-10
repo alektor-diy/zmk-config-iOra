@@ -14,5 +14,17 @@
     right_trackball_listener: right-trackball-listener {
         compatible = "zmk,input-listener";
         device = <&right_trackball_split>;
+
+        scroll {
+            layers = <1 2>;
+            input-processors = <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
+                               <&zip_xy_scaler 1 16>,
+                               <&zip_xy_to_scroll_mapper>;
+        };
     };
+};
+
+&trackball {
+    x-invert;
+    y-invert;
 };
