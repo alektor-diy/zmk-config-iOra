@@ -150,5 +150,15 @@
                 &trans  &trans  &trans  &auto_mouse_del  &mkp LCLK  &auto_mouse_f7    &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
+
+        layer_5 {
+            display-name = "Trackball Settings";
+            bindings = <
+                &kp C_VOL_UP  &kp C_VOL_DN  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+                &kp C_VOL_UP  &kp C_VOL_DN  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+                &kp C_VOL_UP  &kp C_VOL_DN  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+                &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+        };
     };
 };

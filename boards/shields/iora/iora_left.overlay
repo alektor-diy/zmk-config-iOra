@@ -9,10 +9,22 @@
         processor = <&zip_temp_layer 4 800>;
     };
 
+    iora_trackball_keys: iora-trackball-keys {
+        compatible = "askey,trackball-keys";
+        #input-processor-cells = <0>;
+        layers = <1 2 3>;
+        settings-layer = <5>;
+        up-positions = <0 12 24>;
+        down-positions = <1 13 25>;
+        counts-per-tap = <48>;
+        repeat-interval-ms = <40>;
+    };
+
     left_trackball_listener: left-trackball-listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
-        input-processors = <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
+        input-processors = <&iora_trackball_keys>,
+                           <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
                            <&zip_xy_scaler 1 16>,
                            <&zip_xy_to_scroll_mapper>;
     };
@@ -23,8 +35,9 @@
         input-processors = <&iora_auto_mouse>;
 
         scroll {
-            layers = <1 2>;
-            input-processors = <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
+            layers = <1 2 3>;
+            input-processors = <&iora_auto_mouse>,
+                               <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
                                <&zip_xy_scaler 1 16>,
                                <&zip_xy_to_scroll_mapper>;
         };
