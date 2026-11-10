@@ -11,6 +11,12 @@
             display-name = "Auto Mouse Toggle";
         };
 
+        trackball_swap: trackball-swap {
+            compatible = "askey,trackball-swap";
+            #binding-cells = <0>;
+            display-name = "Trackball Swap";
+        };
+
         auto_mouse_del: auto-mouse-del {
             compatible = "askey,auto-mouse-control";
             #binding-cells = <0>;
@@ -21,6 +27,18 @@
             compatible = "askey,auto-mouse-control";
             #binding-cells = <0>;
             bindings = <&lt 1 F7>;
+        };
+
+        auto_mouse_f10: auto-mouse-f10 {
+            compatible = "askey,auto-mouse-control";
+            #binding-cells = <0>;
+            bindings = <&lt 2 F10>;
+        };
+
+        auto_mouse_minus: auto-mouse-minus {
+            compatible = "askey,auto-mouse-control";
+            #binding-cells = <0>;
+            bindings = <&kp MINUS>;
         };
     };
 
@@ -36,6 +54,20 @@
 
         auto_mouse_middle_click {
             key-positions = <39 40>; /* Del + Space */
+            timeout-ms = <50>;
+            layers = <4>;
+            bindings = <&mkp MCLK>;
+        };
+
+        auto_mouse_right_thumb_right_click {
+            key-positions = <42 43>; /* F10 + right thumb center */
+            timeout-ms = <50>;
+            layers = <4>;
+            bindings = <&mkp RCLK>;
+        };
+
+        auto_mouse_right_thumb_middle_click {
+            key-positions = <43 44>; /* Right thumb center + Minus */
             timeout-ms = <50>;
             layers = <4>;
             bindings = <&mkp MCLK>;
@@ -117,7 +149,7 @@
                 &bootloader  &none  &none  &none  &none  &none    &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp MINUS  &kp EQUAL  &kp INTERNATIONAL_3
                 &none  &none  &none  &none  &none  &none          &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &none  &kp LEFT_BRACKET  &kp RIGHT_BRACKET
                 &none  &none  &none  &none  &none  &none          &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp SEMICOLON  &kp SINGLE_QUOTE  &kp NON_US_HASH
-                &auto_mouse_toggle  &none  &none  &none  &kp LSHIFT  &none    &none  &kp NUMBER_0  &kp DOT  &none  &none  &kp INTERNATIONAL_1
+                &auto_mouse_toggle  &trackball_swap  &none  &none  &kp LSHIFT  &none    &none  &kp NUMBER_0  &kp DOT  &none  &none  &kp INTERNATIONAL_1
             >;
         };
 
@@ -147,7 +179,7 @@
                 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
                 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
                 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
-                &trans  &trans  &trans  &auto_mouse_del  &mkp LCLK  &auto_mouse_f7    &trans  &trans  &trans  &trans  &trans  &trans
+                &trans  &trans  &trans  &auto_mouse_del  &mkp LCLK  &auto_mouse_f7    &auto_mouse_f10  &mkp LCLK  &auto_mouse_minus  &trans  &trans  &trans
             >;
         };
 

@@ -1,0 +1,13 @@
+description: Route each iOra trackball through the selected role
+compatible: "askey,trackball-router"
+include: ip_one_param.yaml
+
+properties:
+  auxiliary-scroll:
+    type: phandle-array
+    specifier-space: input-processor
+    required: true
+  primary-scroll:
+    type: phandle-array
+    specifier-space: input-processor
+    required: true

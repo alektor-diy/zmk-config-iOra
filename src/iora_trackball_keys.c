@@ -6,6 +6,8 @@
 #include <zmk/keymap.h>
 #include <zmk/virtual_key_position.h>
 
+#include "iora_trackball_router.h"
+
 #define TRACKBALL_KEYS DT_NODELABEL(iora_trackball_keys)
 #define SETTINGS_LAYER DT_PROP(TRACKBALL_KEYS, settings_layer)
 #define COUNTS_PER_TAP DT_PROP(TRACKBALL_KEYS, counts_per_tap)
@@ -25,6 +27,7 @@ static const uint8_t down_positions[] = DT_PROP(TRACKBALL_KEYS, down_positions);
 
 struct trackball_tap {
     atomic_val_t generation;
+    uint32_t role_epoch;
     uint32_t timestamp;
     uint8_t position;
     uint8_t listener;
@@ -69,14 +72,17 @@ ZMK_SUBSCRIPTION(iora_trackball_keys, zmk_layer_state_changed);
 static void send_trackball_taps(void *unused1, void *unused2, void *unused3) {
     struct trackball_tap tap;
     atomic_val_t last_generation = -1;
+    uint32_t last_role_epoch = 0;
     int last_mode = -1;
     uint32_t last_sent = 0;
 
     while (k_msgq_get(&trackball_taps, &tap, K_FOREVER) == 0) {
         uint32_t now = k_uptime_get_32();
-        if (tap.generation != atomic_get(&layer_generation) || active_key_mode() != tap.mode ||
+        if (tap.role_epoch != iora_trackball_role_epoch() ||
+            tap.generation != atomic_get(&layer_generation) || active_key_mode() != tap.mode ||
             now - tap.timestamp >= REPEAT_INTERVAL_MS ||
-            (tap.generation == last_generation && tap.mode == last_mode &&
+            (tap.role_epoch == last_role_epoch && tap.generation == last_generation &&
+             tap.mode == last_mode &&
              now - last_sent < REPEAT_INTERVAL_MS)) {
             continue;
         }
@@ -93,6 +99,9 @@ static void send_trackball_taps(void *unused1, void *unused2, void *unused3) {
             strcmp(binding.behavior_dev, DEVICE_DT_NAME(DT_NODELABEL(kp))) != 0) {
             continue;
         }
+        if (tap.role_epoch != iora_trackball_role_epoch()) {
+            continue;
+        }
         struct zmk_behavior_binding_event event = {
             .layer = SETTINGS_LAYER,
             .position = ZMK_VIRTUAL_KEY_POSITION_BEHAVIOR_INPUT_PROCESSOR(tap.listener, 0),
@@ -100,6 +109,7 @@ static void send_trackball_taps(void *unused1, void *unused2, void *unused3) {
             .source = ZMK_POSITION_STATE_CHANGE_SOURCE_LOCAL,
         };
         last_generation = tap.generation;
+        last_role_epoch = tap.role_epoch;
         last_mode = tap.mode;
         last_sent = now;
         zmk_behavior_invoke_binding(&binding, event, true);
@@ -110,56 +120,69 @@ static void send_trackball_taps(void *unused1, void *unused2, void *unused3) {
 K_THREAD_DEFINE(iora_trackball_worker, 2048, send_trackball_taps, NULL, NULL, NULL,
                 K_PRIO_PREEMPT(1), 0, 0);
 
-static int process_motion(const struct device *dev, struct input_event *event, uint32_t param1,
-                          uint32_t param2, struct zmk_input_processor_state *state) {
-    static atomic_val_t report_generation;
-    static uint32_t last_tap;
-    static int32_t distance;
-    static bool sent_tap;
-    static bool report_open;
-    static int report_mode = -1;
+struct key_motion {
+    uint32_t role_epoch;
+    atomic_val_t layer_generation;
+    uint32_t last_tap;
+    int32_t distance;
+    bool sent_tap;
+    bool report_open;
+    int mode;
+};
+
+static int process_motion(const struct device *dev, struct input_event *event, uint32_t role_epoch,
+                          uint32_t side, struct zmk_input_processor_state *state) {
+    static struct key_motion motions[IORA_TRACKBALL_SIDE_COUNT];
+    struct key_motion *motion = &motions[side];
 
     if (event->type != INPUT_EV_REL || (event->code != INPUT_REL_X && event->code != INPUT_REL_Y)) {
         return ZMK_INPUT_PROC_CONTINUE;
     }
+    if (role_epoch != iora_trackball_role_epoch()) {
+        return motion->mode >= 0 ? ZMK_INPUT_PROC_STOP : ZMK_INPUT_PROC_CONTINUE;
+    }
+    if (motion->role_epoch != role_epoch) {
+        *motion = (struct key_motion){.role_epoch = role_epoch};
+    }
 
     // A layer change between X and Y applies to the next sensor report.
-    if (!report_open) {
+    if (!motion->report_open) {
         atomic_val_t generation = atomic_get(&layer_generation);
         int mode = active_key_mode();
-        if (generation != report_generation || mode != report_mode) {
-            distance = 0;
-            sent_tap = false;
+        if (generation != motion->layer_generation || mode != motion->mode) {
+            motion->distance = 0;
+            motion->sent_tap = false;
         }
-        report_generation = generation;
-        report_mode = mode;
+        motion->layer_generation = generation;
+        motion->mode = mode;
     }
-    report_open = !event->sync;
+    motion->report_open = !event->sync;
 
-    if (report_mode < 0) {
+    if (motion->mode < 0) {
         return ZMK_INPUT_PROC_CONTINUE;
     }
     if (event->code == INPUT_REL_Y) {
         // PMW3610 reports signed 12-bit motion. Keep at most one step while rate limited.
         int32_t movement = CLAMP(event->value, -2048, 2047);
-        int32_t total = distance + movement;
+        int32_t total = motion->distance + movement;
         uint32_t now = k_uptime_get_32();
         if ((total <= -COUNTS_PER_TAP || total >= COUNTS_PER_TAP) &&
-            (!sent_tap || now - last_tap >= REPEAT_INTERVAL_MS)) {
+            (!motion->sent_tap || now - motion->last_tap >= REPEAT_INTERVAL_MS)) {
             struct trackball_tap tap = {
-                .generation = report_generation,
+                .generation = motion->layer_generation,
+                .role_epoch = role_epoch,
                 .timestamp = now,
-                .position = total < 0 ? up_positions[report_mode] : down_positions[report_mode],
+                .position = total < 0 ? up_positions[motion->mode] : down_positions[motion->mode],
                 .listener = state->input_device_index,
-                .mode = report_mode,
+                .mode = motion->mode,
             };
             if (k_msgq_put(&trackball_taps, &tap, K_NO_WAIT) == 0) {
-                last_tap = now;
-                sent_tap = true;
+                motion->last_tap = now;
+                motion->sent_tap = true;
             }
-            distance = total % COUNTS_PER_TAP;
+            motion->distance = total % COUNTS_PER_TAP;
         } else {
-            distance = CLAMP(total, -COUNTS_PER_TAP, COUNTS_PER_TAP);
+            motion->distance = CLAMP(total, -COUNTS_PER_TAP, COUNTS_PER_TAP);
         }
     }
     return ZMK_INPUT_PROC_STOP;
