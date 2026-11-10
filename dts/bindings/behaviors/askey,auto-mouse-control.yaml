@@ -1,0 +1,8 @@
+description: Toggle auto mouse or dismiss its active layer before forwarding a binding
+compatible: "askey,auto-mouse-control"
+include: zero_param.yaml
+
+properties:
+  bindings:
+    type: phandle-array
+    description: Single fallback binding to forward after dismissing the mouse layer
