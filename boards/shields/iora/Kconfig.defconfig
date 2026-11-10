@@ -1,0 +1,22 @@
+if SHIELD_IORA_LEFT || SHIELD_IORA_RIGHT
+
+config ZMK_KEYBOARD_NAME
+    default "iOra"
+
+config ZMK_SPLIT
+    default y
+
+endif
+
+if SHIELD_IORA_LEFT
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING
+    default y
+
+config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY
+    default y
+
+endif

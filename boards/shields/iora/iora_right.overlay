@@ -1,0 +1,9 @@
+#include "iora.dtsi"
+
+&iora_transform {
+    col-offset = <6>;
+};
+
+&right_trackball_split {
+    device = <&trackball>;
+};

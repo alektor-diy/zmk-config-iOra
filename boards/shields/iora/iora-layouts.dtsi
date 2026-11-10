@@ -1,0 +1,69 @@
+// Key centers and rotations from the iOra v0.9.0 PCBs, using 17 mm per unit.
+// The halves are shown side by side with one unit of space between them.
+/ {
+    iora_layout: iora-layout {
+        compatible = "zmk,physical-layout";
+        display-name = "iOra";
+        transform = <&iora_transform>;
+        kscan = <&kscan0>;
+        keys
+            //                     w   h    x    y    rot   rx   ry
+            // Row 1 left.
+            = <&key_physical_attrs  100  100    0    0       0   50   50>
+            , <&key_physical_attrs  100  100  100    0       0  150   50>
+            , <&key_physical_attrs  100  100  203    3     300  253   53>
+            , <&key_physical_attrs  100  100  305    9     600  355   59>
+            , <&key_physical_attrs  100  100  407   20     900  457   70>
+            , <&key_physical_attrs  100  100  508   36    1200  558   86>
+            // Row 1 right.
+            , <&key_physical_attrs  100  100  906   36 (-1200)  956   86>
+            , <&key_physical_attrs  100  100 1007   20  (-900) 1057   70>
+            , <&key_physical_attrs  100  100 1109    9  (-600) 1159   59>
+            , <&key_physical_attrs  100  100 1212    3  (-300) 1262   53>
+            , <&key_physical_attrs  100  100 1314    0       0 1364   50>
+            , <&key_physical_attrs  100  100 1414    0       0 1464   50>
+            // Row 2 left.
+            , <&key_physical_attrs  100  100    0  100       0   50  150>
+            , <&key_physical_attrs  100  100  100  100       0  150  150>
+            , <&key_physical_attrs  100  100  203  103     300  253  153>
+            , <&key_physical_attrs  100  100  305  110     600  355  160>
+            , <&key_physical_attrs  100  100  407  122     900  457  172>
+            , <&key_physical_attrs  100  100  508  138    1200  558  188>
+            // Row 2 right.
+            , <&key_physical_attrs  100  100  906  138 (-1200)  956  188>
+            , <&key_physical_attrs  100  100 1007  122  (-900) 1057  172>
+            , <&key_physical_attrs  100  100 1109  110  (-600) 1159  160>
+            , <&key_physical_attrs  100  100 1212  103  (-300) 1262  153>
+            , <&key_physical_attrs  100  100 1314  100       0 1364  150>
+            , <&key_physical_attrs  100  100 1414  100       0 1464  150>
+            // Row 3 left.
+            , <&key_physical_attrs  100  100    0  200       0   50  250>
+            , <&key_physical_attrs  100  100  100  200       0  150  250>
+            , <&key_physical_attrs  100  100  203  203     300  253  253>
+            , <&key_physical_attrs  100  100  305  210     600  355  260>
+            , <&key_physical_attrs  100  100  407  223     900  457  273>
+            , <&key_physical_attrs  100  100  508  241    1200  558  291>
+            // Row 3 right.
+            , <&key_physical_attrs  100  100  907  241 (-1200)  957  291>
+            , <&key_physical_attrs  100  100 1008  223  (-900) 1058  273>
+            , <&key_physical_attrs  100  100 1109  210  (-600) 1159  260>
+            , <&key_physical_attrs  100  100 1212  203  (-300) 1262  253>
+            , <&key_physical_attrs  100  100 1314  200       0 1364  250>
+            , <&key_physical_attrs  100  100 1414  200       0 1464  250>
+            // Row 4 left.
+            , <&key_physical_attrs  100  100    0  300       0   50  350>
+            , <&key_physical_attrs  100  100  100  300       0  150  350>
+            , <&key_physical_attrs  100  100  203  303     300  253  353>
+            , <&key_physical_attrs  100  100  407  324     900  457  374>
+            , <&key_physical_attrs  100  100  507  343    1200  557  393>
+            , <&key_physical_attrs  100  100  607  367    1500  657  417>
+            // Row 4 right.
+            , <&key_physical_attrs  100  100  807  367 (-1500)  857  417>
+            , <&key_physical_attrs  100  100  907  343 (-1200)  957  393>
+            , <&key_physical_attrs  100  100 1008  324  (-900) 1058  374>
+            , <&key_physical_attrs  100  100 1212  303  (-300) 1262  353>
+            , <&key_physical_attrs  100  100 1314  300       0 1364  350>
+            , <&key_physical_attrs  100  100 1414  300       0 1464  350>
+            ;
+    };
+};

@@ -1,0 +1,5 @@
+config SHIELD_IORA_LEFT
+    def_bool $(shields_list_contains,iora_left)
+
+config SHIELD_IORA_RIGHT
+    def_bool $(shields_list_contains,iora_right)

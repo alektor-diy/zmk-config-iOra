@@ -1,0 +1,18 @@
+#include <dt-bindings/zmk/input_transform.h>
+#include <input/processors.dtsi>
+#include "iora.dtsi"
+
+/ {
+    left_trackball_listener: left-trackball-listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball>;
+        input-processors = <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
+                           <&zip_xy_scaler 1 16>,
+                           <&zip_xy_to_scroll_mapper>;
+    };
+
+    right_trackball_listener: right-trackball-listener {
+        compatible = "zmk,input-listener";
+        device = <&right_trackball_split>;
+    };
+};
