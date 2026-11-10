@@ -1,0 +1,3 @@
+description: Swap the iOra trackball roles and save the selection
+compatible: "askey,trackball-swap"
+include: zero_param.yaml

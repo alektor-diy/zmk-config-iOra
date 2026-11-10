@@ -7,6 +7,8 @@
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/keymap.h>
 
+#include "iora_trackball_router.h"
+
 #define AUTO_MOUSE_NODE DT_NODELABEL(iora_auto_mouse)
 #define MOUSE_LAYER DT_PHA(AUTO_MOUSE_NODE, processor, param1)
 #define MOUSE_TIMEOUT_MS DT_PHA(AUTO_MOUSE_NODE, processor, param2)
@@ -17,6 +19,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 // A missing setting leaves auto mouse enabled.
 static atomic_t auto_mouse_disabled;
+static atomic_t last_motion_epoch;
 
 #if IS_ENABLED(CONFIG_SETTINGS)
 static int load_auto_mouse_setting(const char *name, size_t len, settings_read_cb read_cb,
@@ -49,13 +52,15 @@ SETTINGS_STATIC_HANDLER_DEFINE(iora_auto_mouse_settings, SETTINGS_ROOT, NULL,
                                load_auto_mouse_setting, NULL, NULL);
 #endif
 
-static int process_motion(const struct device *dev, struct input_event *event, uint32_t param1,
+static int process_motion(const struct device *dev, struct input_event *event, uint32_t role_epoch,
                           uint32_t param2, struct zmk_input_processor_state *state) {
-    if (atomic_get(&auto_mouse_disabled) || event->type != INPUT_EV_REL ||
+    if (role_epoch != iora_trackball_role_epoch() || atomic_get(&auto_mouse_disabled) ||
+        event->type != INPUT_EV_REL ||
         (event->code != INPUT_REL_X && event->code != INPUT_REL_Y) || event->value == 0) {
         return ZMK_INPUT_PROC_CONTINUE;
     }
 
+    atomic_set(&last_motion_epoch, (atomic_val_t)role_epoch);
     const struct device *temp_layer = DEVICE_DT_GET(DT_PHANDLE(AUTO_MOUSE_NODE, processor));
     return zmk_input_processor_handle_event(temp_layer, event, MOUSE_LAYER, MOUSE_TIMEOUT_MS, state);
 }
@@ -76,7 +81,9 @@ static int on_layer_state_changed(const zmk_event_t *event) {
 
     // Clear the prior mouse layer on entry so the new layer starts with its own keys.
     if ((change->layer >= 1 && change->layer <= 3) ||
-        (change->layer == MOUSE_LAYER && atomic_get(&auto_mouse_disabled))) {
+        (change->layer == MOUSE_LAYER &&
+         (atomic_get(&auto_mouse_disabled) ||
+          (uint32_t)atomic_get(&last_motion_epoch) != iora_trackball_role_epoch()))) {
         zmk_keymap_layer_deactivate(MOUSE_LAYER);
     }
     return ZMK_EV_EVENT_BUBBLE;
