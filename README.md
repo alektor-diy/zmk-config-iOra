@@ -56,7 +56,7 @@ Studioで保存したキーやレイヤー名は、通常のFW更新後も優先
 | ボールのキー入力の感度・連続入力間隔 | [iora_left.overlay](boards/shields/iora/iora_left.overlay) | `counts-per-tap = <48>` を小さくすると短い移動で反応します。`repeat-interval-ms = <40>` は連続入力の最短間隔です。 |
 | スクロールの速さ | [iora_left.overlay](boards/shields/iora/iora_left.overlay) | `auxiliary-scroll` は通常時のスクロール、`primary-scroll` はL1〜3のスクロールの設定です。各 `zip_xy_scaler 1 16` の分母を小さくすると速くなります。 |
 | トラックボールのセンサー感度 | [iora.dtsi](boards/shields/iora/iora.dtsi) | `cpi = <800>` を変更します。左右共通の設定なので、変更後は両側のFWを書き込みます。 |
-| ディープスリープまでの時間 | [config/iora.conf](config/iora.conf) | `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT=900000` のように追記します。初期値は900,000 ms（15分）です。変更後は両側のFWを書き込みます。 |
+| ディープスリープまでの時間 | [config/iora.conf](config/iora.conf) | `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT` を変更します。iOraの初期値は3,600,000 ms（1時間）です。変更後は両側のFWを書き込みます。 |
 
 たとえばミュートを割り当てるなら、対象のキーを `&kp C_MUTE` に置き換えます。`&none` は入力なし、`&trans` は下の有効なレイヤーの割り当てを使います。オートマウスのクリック位置を変更する場合は、L4の割り当てとコンボに加えて、`iora_left.overlay` の `excluded-positions` も合わせます。[ZMKキーコード一覧](https://v0-3-branch.zmk.dev/docs/keymaps/list-of-keycodes)・[ZMKコンボの設定](https://zmk.dev/docs/keymaps/combos)
 
