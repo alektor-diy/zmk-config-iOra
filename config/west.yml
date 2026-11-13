@@ -18,5 +18,10 @@ manifest:
     - name: zmk-feature-non-lipo-battery-management
       remote: sekigon-gonnoc
       revision: 43fa56fb7d1e065393e926b6caa0ea02cb86eca7
+    - name: zmk-satellite
+      url: https://github.com/alektor-diy/zmk-satellite
+      revision: b0660ff2f3784a0db54596cd660e1d6f7ea218a3
+      path: modules/zmk-satellite
+      import: module/west.yml
   self:
     path: config
