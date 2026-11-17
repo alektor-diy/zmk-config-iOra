@@ -1,1 +1,2 @@
 askey	AsKey
+cormoran	cormoran

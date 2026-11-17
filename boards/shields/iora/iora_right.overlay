@@ -9,6 +9,5 @@
 };
 
 &trackball {
-    x-invert;
-    y-invert;
+    settings-id = "right";
 };

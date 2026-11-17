@@ -43,7 +43,7 @@ static int load_auto_mouse_setting(const char *name, size_t len, settings_read_c
 
     atomic_set(&auto_mouse_disabled, disabled);
     if (disabled) {
-        zmk_keymap_layer_deactivate(MOUSE_LAYER);
+        zmk_keymap_layer_deactivate(MOUSE_LAYER, false);
     }
     return 0;
 }
@@ -84,7 +84,7 @@ static int on_layer_state_changed(const zmk_event_t *event) {
         (change->layer == MOUSE_LAYER &&
          (atomic_get(&auto_mouse_disabled) ||
           (uint32_t)atomic_get(&last_motion_epoch) != iora_trackball_role_epoch()))) {
-        zmk_keymap_layer_deactivate(MOUSE_LAYER);
+        zmk_keymap_layer_deactivate(MOUSE_LAYER, false);
     }
     return ZMK_EV_EVENT_BUBBLE;
 }
@@ -99,7 +99,7 @@ static int control_pressed(struct zmk_behavior_binding *binding,
 
     if (fallback) {
         if (event.layer == MOUSE_LAYER) {
-            zmk_keymap_layer_deactivate(MOUSE_LAYER);
+            zmk_keymap_layer_deactivate(MOUSE_LAYER, false);
             // Record the underlying layer for both this press and the physical release.
             return zmk_keymap_position_state_changed(event.source, event.position, true,
                                                     event.timestamp);
@@ -108,7 +108,7 @@ static int control_pressed(struct zmk_behavior_binding *binding,
     }
     const uint8_t disabled = !atomic_xor(&auto_mouse_disabled, 1);
     if (disabled) {
-        zmk_keymap_layer_deactivate(MOUSE_LAYER);
+        zmk_keymap_layer_deactivate(MOUSE_LAYER, false);
     }
 #if IS_ENABLED(CONFIG_SETTINGS)
     int ret = settings_save_one(SETTINGS_ROOT "/" DISABLED_SETTING, &disabled, sizeof(disabled));

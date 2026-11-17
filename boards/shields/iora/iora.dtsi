@@ -77,6 +77,18 @@
     status = "disabled";
 };
 
+// Zephyr 4.1 enables the XIAO header SPI by default. Its pinctrl claims
+// P1.13 (sensor RESET), P1.14 (sensor SCK) and P1.15 (sensor CS).
+// iOra uses spi0 with its own pinctrl instead, so do not initialize spi2.
+&xiao_spi {
+    status = "disabled";
+};
+
+// Zephyr 4.1 moved the NFC pin override from Kconfig to devicetree.
+&uicr {
+    nfct-pins-as-gpios;
+};
+
 &spi0 {
     compatible = "nordic,nrf-spim";
     status = "okay";
@@ -86,17 +98,16 @@
     pinctrl-names = "default", "sleep";
 
     trackball: trackball@0 {
-        compatible = "pixart,pmw3610";
+        compatible = "cormoran,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
         irq-gpios = <&gpio1 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        rst-gpios = <&gpio1 13 GPIO_ACTIVE_LOW>;
+        // This driver resets the sensor over SPI; P1.13 is not driven.
         cpi = <800>;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
-        // Verify the initial axis swap against the installed sensor orientation.
-        xy-swap;
+        // Axis defaults are shared by both halves in config/iora.conf.
     };
 };
 

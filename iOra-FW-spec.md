@@ -1,5 +1,17 @@
 # iOra v0.9.0 のZMKファームウェア実装仕様
 
+## dev/dya-studioの構成
+
+- このブランチはcormoran版ZMKの `main+custom-studio-protocol` 系（Zephyr 4.1）を使用する。ZMK、Runtime Combo、Custom Settingsは `config/west.yml` のコミットに固定する。以下に残るv0.3への参照は元の実装の背景資料。
+- ボードは `xiao_ble/nrf52840/zmk`。NFC端子のGPIO化は `iora.dtsi` の `&uicr { nfct-pins-as-gpios; };` で指定する。
+- Zephyr 4.1のXIAO定義で既定有効な `xiao_spi`（SPI2）は明示的に無効化する。その既定pinctrlはP1.13をSCK、P1.15をMOSI、P1.14をMISOに割り当て、iOraのセンサーRESET・CS・SCKと競合する。センサー用にはiOra独自pinctrlのSPI0だけを使用する。両側の生成devicetreeで競合を確認し修正した。
+- PMW3610ドライバーは `cormoran/zmk-driver-pmw3610-with-custom-studio-rpc` を使用し、`compatible = "cormoran,pmw3610"` とする。CPI・軸変換・初期化待機・レポート間隔の初期値を維持する。軸変換は共通Kconfig、センサー設定IDは左 `left`／右 `right`。ハードウェアRESET（P1.13）は駆動せず、SPIのソフトウェアリセットを使う。SPI2競合修正後、ユーザー実機で右ボール入力・左スクロールの復旧を確認済み。
+- センサーのフレームキャプチャ／ストリーミング中はドライバーがmotion IRQと通常レポートを停止する。通常入力の確認はストリーミング停止後に行う。
+- 左centralだけにRuntime ComboとそのStudio RPCを有効化する。既存の11コンボは `cormoran,runtime-combo-defaults` のスロット0〜10へ移行し、16枠中5枠を空ける。位置・出力・レイヤー・timeout・slow-releaseの初期値は従来どおり。
+- DYA Studioからコンボを編集・保存できる。独自トラックボール処理、オートマウス、L5によるボールキー割り当て、電池管理、ZMK Satelliteは従来の方式を使う。Runtime MacroとDYAのRuntime Input Processorは対象外。
+- PMW3610のセンサー設定と診断RPCを追加し、右センサーにもsplit relayで到達できる構成とする。リレーのペイロード上限は240バイト、低優先ワークキューのスタックは両側4096バイト。センサーRPCのStudio公開は左centralのみ。
+- Zephyr更新を含む初回移行では左右両方のFWを更新する。実機での確認項目と操作方法はREADMEのDYA Studio節を参照。
+
 ## 対象基板とコントローラー
 
 - 対象は `iOra_v0.9.0` の `iOra_L_xiao/iOra_L.kicad_sch`、`iOra_L_xiao/iOra_L.kicad_pcb`、`iOra_R_xiao/iOra_R.kicad_sch`、`iOra_R_xiao/iOra_R.kicad_pcb`。左右の回路図とPCBのパッド接続を照合した。

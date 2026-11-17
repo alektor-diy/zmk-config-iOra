@@ -1,20 +1,27 @@
 manifest:
-  defaults:
-    revision: v0.3
   remotes:
-    - name: zmkfirmware
-      url-base: https://github.com/zmkfirmware
+    - name: cormoran
+      url-base: https://github.com/cormoran
     - name: sekigon-gonnoc
       url-base: https://github.com/sekigon-gonnoc
-    - name: efogdev
-      url-base: https://github.com/efogdev
   projects:
     - name: zmk
-      remote: zmkfirmware
+      remote: cormoran
+      # main+custom-studio-protocol: DYA custom Studio RPC (Zephyr 4.1).
+      revision: 1fc72aaff7a42bd533c1f4c9b3f23c5317c745f4
       import: app/west.yml
-    - name: zmk-pmw3610-driver
-      remote: efogdev
-      revision: 42e0a8557a3adc43231fef4234f23e530034e427
+    - name: zmk-feature-runtime-combo
+      remote: cormoran
+      revision: d9490e7b5d41c516221d131241009e81740efcee
+      import: true
+    # Override the module's floating dependency to keep builds reproducible.
+    - name: zmk-feature-custom-settings
+      remote: cormoran
+      revision: c6a7fef3a3be3d3ace5de9a4b0628c6418cd1f3f
+    - name: zmk-driver-pmw3610-with-custom-studio-rpc
+      remote: cormoran
+      revision: 5c34ea0eec246a1c986111417cd779b53144629a
+      import: true
     - name: zmk-feature-non-lipo-battery-management
       remote: sekigon-gonnoc
       revision: 43fa56fb7d1e065393e926b6caa0ea02cb86eca7

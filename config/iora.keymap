@@ -42,10 +42,13 @@
         };
     };
 
-    combos {
-        compatible = "zmk,combos";
+    // Keep slots stable: saved DYA overrides are addressed by slot number.
+    runtime_combo_defaults {
+        compatible = "cormoran,runtime-combo-defaults";
 
         auto_mouse_right_click {
+            slot = <0>;
+            display-name = "Auto Mouse Left RClick";
             key-positions = <40 41>; /* Space + F7 */
             timeout-ms = <50>;
             layers = <4>;
@@ -53,6 +56,8 @@
         };
 
         auto_mouse_middle_click {
+            slot = <1>;
+            display-name = "Auto Mouse Left MClick";
             key-positions = <39 40>; /* Del + Space */
             timeout-ms = <50>;
             layers = <4>;
@@ -60,6 +65,8 @@
         };
 
         auto_mouse_right_thumb_right_click {
+            slot = <2>;
+            display-name = "Auto Mouse Right RClick";
             key-positions = <42 43>; /* F10 + right thumb center */
             timeout-ms = <50>;
             layers = <4>;
@@ -67,6 +74,8 @@
         };
 
         auto_mouse_right_thumb_middle_click {
+            slot = <3>;
+            display-name = "Auto Mouse Right MClick";
             key-positions = <43 44>; /* Right thumb center + Minus */
             timeout-ms = <50>;
             layers = <4>;
@@ -74,6 +83,8 @@
         };
 
         grave {
+            slot = <4>;
+            display-name = "Grave";
             key-positions = <0 1>;
             timeout-ms = <50>;
             layers = <0>;
@@ -82,6 +93,8 @@
         };
 
         print_screen {
+            slot = <5>;
+            display-name = "Print Screen";
             key-positions = <10 11>;
             timeout-ms = <50>;
             layers = <0>;
@@ -90,6 +103,8 @@
         };
 
         home {
+            slot = <6>;
+            display-name = "Home";
             key-positions = <45 46>;
             timeout-ms = <50>;
             layers = <0>;
@@ -98,6 +113,8 @@
         };
 
         end {
+            slot = <7>;
+            display-name = "End";
             key-positions = <46 47>;
             timeout-ms = <50>;
             layers = <0>;
@@ -106,6 +123,8 @@
         };
 
         left_click {
+            slot = <8>;
+            display-name = "Left Click";
             key-positions = <15 16>;
             timeout-ms = <50>;
             layers = <0>;
@@ -114,6 +133,8 @@
         };
 
         right_click {
+            slot = <9>;
+            display-name = "Right Click";
             key-positions = <14 15>;
             timeout-ms = <50>;
             layers = <0>;
@@ -122,6 +143,8 @@
         };
 
         middle_click {
+            slot = <10>;
+            display-name = "Middle Click";
             key-positions = <14 15 16>;
             timeout-ms = <50>;
             layers = <0>;

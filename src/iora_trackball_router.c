@@ -44,7 +44,7 @@ static int load_swap_setting(const char *name, size_t len, settings_read_cb read
     }
     if ((iora_trackball_role_epoch() & 1u) != swapped) {
         atomic_inc(&role_epoch);
-        zmk_keymap_layer_deactivate(MOUSE_LAYER);
+        zmk_keymap_layer_deactivate(MOUSE_LAYER, false);
     }
     return 0;
 }
@@ -132,7 +132,7 @@ DEVICE_DT_DEFINE(ROUTER, NULL, NULL, NULL, NULL, POST_KERNEL, CONFIG_KERNEL_INIT
 static int swap_pressed(struct zmk_behavior_binding *binding,
                         struct zmk_behavior_binding_event event) {
     uint32_t epoch = (uint32_t)atomic_inc(&role_epoch) + 1u;
-    zmk_keymap_layer_deactivate(MOUSE_LAYER);
+    zmk_keymap_layer_deactivate(MOUSE_LAYER, false);
 #if IS_ENABLED(CONFIG_SETTINGS)
     const uint8_t swapped = epoch & 1u;
     int ret = settings_save_one(SWAP_SETTING, &swapped, sizeof(swapped));

@@ -7,6 +7,7 @@ iOraは左右にトラックボールを備えた48キーの分割キーボー�
 - [全レイヤーの配置と同時押しの図](iOra-keymap-cheatsheet.md)
 - [Bluetoothの接続と切り替え](#bluetooth)
 - [ZMK Studioでキーを変更する](#zmk-studioでキーを変更する)
+- [DYA Studioでコンボを変更する](#dya-studioでコンボを変更する)
 - [設定ファイルで動作を変更する](#設定ファイルで動作を変更する)
 - [ファームウェアを書き込む](#ファームウェアを書き込む)
 
@@ -42,14 +43,45 @@ Studioで保存したキーやレイヤー名は、通常のFW更新後も優先
 
 ![L5の設定枠。最上段がL1、2段目がL2、3段目がL3。各段の左端が上方向、右隣が下方向](docs/images/layer-5.svg)
 
+## DYA Studioでコンボを変更する
+
+`dev/dya-studio` はDYA Studio対応FWです。cormoran版ZMK（独自Studio RPC対応、Zephyr 4.1）とRuntime Comboモジュールを使います。初回移行では、このブランチからビルドした **左右両方** のFWを書き込んでください。
+
+生成済みFW: [左手用 iOra_L.uf2](iOra_L.uf2)・[右手用 iOra_R.uf2](iOra_R.uf2)。DYA接続・コンボ表示・右ボール入力・左ボールのスクロールはユーザー実機で確認済みです。設定変更後の保存・再起動による保持は未確認です。[ビルド・検証記録](docs/dya-studio-build.md)も参照してください。
+
+1. 左手側をUSBでPCにつなぎ、Chrome／Edgeで [DYA Studio](https://studio.dya.cormoran.works/) を開き、USB接続でiOraを選びます。
+2. **F10／L2＋右下のStudio Unlock** でロックを解除します。
+3. **Macros & Combos** 画面のコンボ一覧から対象を選び、押すキーの位置、出力する動作、有効レイヤー、タイムアウト、slow-releaseなどを編集します。
+4. 編集した内容を保存し、再起動後も反映されることを確認します。初期値のあるコンボは **Reset to Default** でFW内の初期値に戻せます。
+
+コンボは最大16個です。スロット0〜10に従来の11個を同じキー位置・動作・レイヤー・50 msのタイムアウトで登録し、11〜15は追加用に空けています。マウスの左／右／中クリックとオートマウス中の親指コンボも編集できます。コンボの保存値はスロット番号に対応するため、FW側の初期値を変更する際は既存の `slot` 番号を維持してください。保存済みのコンボ設定はFW内の初期値より優先されます。
+
+キー割り当てとL5経由のトラックボールキー設定もDYA Studioで編集できます。Runtime Macroは含めていません。
+
+### PMW3610センサーの設定と診断
+
+センサーには [cormoran/zmk-driver-pmw3610-with-custom-studio-rpc](https://github.com/cormoran/zmk-driver-pmw3610-with-custom-studio-rpc) を使用します。現在のUF2では、Zephyr 4.1のXIAO標準SPI2がセンサー端子と競合する問題を修正し、左右のボール動作をユーザー実機で確認済みです。
+
+この版も **左右両方** を更新してください。Studio Unlock後、DYA Studioの **診断 → トラックボールセンサー（PMW3610）** でセンサーの認識・初期化状態を確認できます。右手のセンサーへの診断・設定は左手経由のsplit RPC relayを有効にしています。動かない場合は、センサーのReady、Init error、Product IDを確認してください。
+
+診断の状態行はセンサーごとに1行表示され、この構成では上が左（ローカル）、下が右（リレー取得）です。**センサーのライブビューをストリーミング中は、対象センサーの通常入力が停止します。** ボール操作に戻る前に **ストリーミング停止** を押してください。
+
+DYAの **トラックボール → PMW3610ドライバー** からセンサーのCPIや軸設定などを変更・保存できる構成です。初期値は従来と同じ800 CPI、XY入れ替え＋両軸反転、起動待機1秒、レポート間隔8 msです。左右の設定IDは `left`／`right` に分けています。
+
+**プロセッサー** 欄はiOra独自のボール役割分岐を使っているため、DYAのRuntime Input Processorとしては表示されません。この欄の「見つからない」と、センサー自体の初期化失敗は別です。スクロール倍率、ボールのキー入力感度、オートマウスの時間は引き続き下記の設定ファイルで変更します。
+
+移行後は左右のキー入力、両方のボール、オートマウス、左右の役割切り替えを確認してください。重なりのある `<14 15>`／`<15 16>`／`<14 15 16>` のクリックコンボは、2キーと3キーそれぞれで動作を確認します。
+
+[DYA導入ガイド](https://studio.dya.cormoran.works/developer-guide/modules/keymap)・[Runtime Comboの仕様](https://github.com/cormoran/zmk-feature-runtime-combo)
+
 ## 設定ファイルで動作を変更する
 
-コンボの追加やタイミング、トラックボールの感度などは設定ファイルで変更し、FWを再ビルドします。
+トラックボールの感度やFW内の初期値などは設定ファイルで変更し、FWを再ビルドします。DYA対応FWでは、コンボの追加やタイミングを上記の画面から変更できます。
 
 | 変更したいこと | 編集する場所 | 変更方法 |
 | --- | --- | --- |
 | キーやレイヤー名 | [config/iora.keymap](config/iora.keymap) | 対象レイヤーの `bindings` または `display-name` を編集します。各行は左手6キー、右手6キーの順です。 |
-| 同時押し（コンボ） | [config/iora.keymap](config/iora.keymap) | `combos` の `key-positions`、`bindings`、`layers`、`timeout-ms` を編集します。位置番号は左上を0とし、各段を左から右へ12個ずつ数えます。 |
+| 同時押し（コンボ）の初期値 | [config/iora.keymap](config/iora.keymap) | `runtime_combo_defaults` の `key-positions`、`bindings`、`layers`、`timeout-ms` を編集します。既存の `slot` 番号は維持します。位置番号は左上を0とし、各段を左から右へ12個ずつ数えます。 |
 | オートマウスのON/OFFキー | [config/iora.keymap](config/iora.keymap) | `&auto_mouse_toggle` を移します。初期位置はL1の左下（通常は左Ctrl）です。切り替えた状態は左手側に保存されます。 |
 | トラックボールの左右切り替えキー | [config/iora.keymap](config/iora.keymap) | `&trackball_swap` を移します。初期位置はL1の左下から2番目（通常はGUIキー）です。 |
 | オートマウスの解除時間・入力直後の待機時間 | [iora_left.overlay](boards/shields/iora/iora_left.overlay) | `processor = <&zip_temp_layer 4 800>` の最後が解除までの時間、`require-prior-idle-ms = <200>` がキー入力直後の待機時間です。単位はmsです。 |
@@ -68,7 +100,7 @@ Studioで保存したキーやレイヤー名は、通常のFW更新後も優先
 
 ## ファームウェアを書き込む
 
-1. 初期FWを使う場合は、リポジトリの [左手用UF2](iOra_L-zmk.uf2) または [右手用UF2](iOra_R-zmk.uf2) を用意します。
+1. このブランチの [左手用UF2](iOra_L.uf2) と [右手用UF2](iOra_R.uf2)、またはこのブランチのGitHub Actionsで再ビルドしたUF2を用意します。DYA対応への初回移行時は両方を更新します。
 2. 書き込む側をUSBでPCにつなぎ、ブートローダーに入れます。左側は **F7／L1を長押し＋左上のEscの位置**、右側は **F10／L2を長押し＋右上のBkspの位置**です。右側をキー操作で起動する場合は、左右が接続されている状態で行います。キー操作が使えない場合は、対象側のXIAOのリセットボタンを2回続けて押します。
 3. 表示されたUSBドライブに対応するUF2をコピーします。両側の更新が必要な場合は片側ずつ行います。
 
