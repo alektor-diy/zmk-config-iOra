@@ -20,7 +20,7 @@ manifest:
       revision: 43fa56fb7d1e065393e926b6caa0ea02cb86eca7
     - name: zmk-satellite
       url: https://github.com/alektor-diy/zmk-satellite
-      revision: master
+      revision: main
       path: modules/zmk-satellite
   self:
     path: config
