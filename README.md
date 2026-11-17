@@ -47,12 +47,14 @@ Studioで保存したキーやレイヤー名は、通常のFW更新後も優先
 
 `dev/dya-studio` はDYA Studio対応FWです。cormoran版ZMK（独自Studio RPC対応、Zephyr 4.1）とRuntime Comboモジュールを使います。初回移行では、このブランチからビルドした **左右両方** のFWを書き込んでください。
 
-生成済みFW: [左手用 iOra_L.uf2](iOra_L.uf2)・[右手用 iOra_R.uf2](iOra_R.uf2)。DYA接続・コンボ表示・右ボール入力・左ボールのスクロールはユーザー実機で確認済みです。設定変更後の保存・再起動による保持は未確認です。[ビルド・検証記録](docs/dya-studio-build.md)も参照してください。
+生成済みFW: [左手用 iOra_L.uf2](iOra_L.uf2)・[右手用 iOra_R.uf2](iOra_R.uf2)。現在は通常使用中のハングを調べるため、スタック容量を増やした切り分け版です。DYA接続・コンボ表示・両ボールの基本動作は前版で確認済みですが、今回の安定性改善は未確認です。[ハング調査記録](docs/dya-stability-investigation.md)・[ビルド・検証記録](docs/dya-studio-build.md)を参照してください。
 
 1. 左手側をUSBでPCにつなぎ、Chrome／Edgeで [DYA Studio](https://studio.dya.cormoran.works/) を開き、USB接続でiOraを選びます。
 2. **F10／L2＋右下のStudio Unlock** でロックを解除します。
 3. **Macros & Combos** 画面のコンボ一覧から対象を選び、押すキーの位置、出力する動作、有効レイヤー、タイムアウト、slow-releaseなどを編集します。
 4. 編集した内容を保存し、再起動後も反映されることを確認します。初期値のあるコンボは **Reset to Default** でFW内の初期値に戻せます。
+
+無線で設定する場合は、同じPCへBluetoothでキー入力できる状態にしてUSBを抜き、**Studio Unlockを押してから** DYA Studioの **Bluetoothで接続** を選びます。Satelliteは `fix/dya-studio-ble-advertising` ブランチを参照し、Unlock中はStudioへ広告制御を譲り、ロック後に状態通知を再開する構成です。この版での無線接続の実機確認はまだ行っていません。
 
 コンボは最大16個です。スロット0〜10に従来の11個を同じキー位置・動作・レイヤー・50 msのタイムアウトで登録し、11〜15は追加用に空けています。マウスの左／右／中クリックとオートマウス中の親指コンボも編集できます。コンボの保存値はスロット番号に対応するため、FW側の初期値を変更する際は既存の `slot` 番号を維持してください。保存済みのコンボ設定はFW内の初期値より優先されます。
 

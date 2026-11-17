@@ -1,6 +1,6 @@
 # DYA Studio対応FWのビルド・検証記録
 
-2026-11-17、`dev/dya-studio` の変更内容からWindows上で左右のUF2を生成。以下はDYA対応PMW3610ドライバーを使用し、SPI2のピン競合を修正した生成物。
+2026-11-17、`dev/dya-studio` の変更内容からWindows上で左右のUF2を生成。以下はDYA対応PMW3610ドライバー、SPI2競合修正、スタック容量見直し、SatelliteのStudio広告競合修正ブランチを含む生成物。通常使用中の完全停止への効果と無線Studio接続の成功は未確認で、[別記の調査](dya-stability-investigation.md)で切り分け中。
 
 初版はユーザー実機でDYA Studioの接続・コンボ表示が成功した一方、左右ともボールが動かないとの報告があった。診断対応版でもID `0xff`・初期化エラー `-5` が報告された。
 
@@ -17,7 +17,7 @@
 - Runtime Combo: `d9490e7b5d41c516221d131241009e81740efcee`
 - Custom Settings: `c6a7fef3a3be3d3ace5de9a4b0628c6418cd1f3f`
 - PMW3610: `5c34ea0eec246a1c986111417cd779b53144629a`（`zmk-driver-pmw3610-with-custom-studio-rpc`）
-- ZMK Satellite: `de52f96`（マニフェストの既存指定 `main` を解決したコミット）
+- ZMK Satellite: `29bd37c09d1904808e2c2ef81e6c31d3e1f58f34`（マニフェスト指定 `fix/dya-studio-ble-advertising` を解決したコミット）
 
 依存モジュールは一時ワークスペースに取得し、`build.yaml` と同じボード・shield・snippet・Kconfig指定でビルド。iOra自身は `ZMK_EXTRA_MODULES` として読み込み、リポジトリの `config` を使用した。GitHub Actionsの実行は行っていない。
 
@@ -25,19 +25,20 @@
 
 | 対象 | ファイル | UF2サイズ | FLASH使用量 / 788 KiB | RAM使用量 / 256 KiB |
 | --- | --- | --- | --- | --- |
-| 左central | [iOra_L.uf2](../iOra_L.uf2) | 666,112 B | 332,900 B（41.26%） | 136,388 B（52.03%） |
-| 右peripheral | [iOra_R.uf2](../iOra_R.uf2) | 472,576 B | 236,224 B（29.28%） | 80,704 B（30.79%） |
+| 左central | [iOra_L.uf2](../iOra_L.uf2) | 666,624 B | 333,104 B（41.28%） | 141,892 B（54.13%） |
+| 右peripheral | [iOra_R.uf2](../iOra_R.uf2) | 472,576 B | 236,224 B（29.28%） | 83,776 B（31.96%） |
 
 SHA-256:
 
 ```text
-iOra_L.uf2  5a879b3ba31086c821498165a7b8c7f97e2247436904411a495ce380e079c823
-iOra_R.uf2  b6a3f451dc381f63c225848d7517885a9e378a64ee27ed1ed5359f62c5f722b8
+iOra_L.uf2  5cba1d1c0a9b79ae142c907b9ffe1a52696ac7adc9fcc2b0b4b105e630dad070
+iOra_R.uf2  c75105e76ea771c035b80a2bbe70d3ae304fc01e901528e10a05962609b9255c
 ```
 
 ## 確認済み
 
 - 左右ともコンパイル・リンク・UF2変換に成功。
+- Satellite修正ブランチの `tests/test_advertising.py` をホストGCCで実行し、API機能差とStudio有無の4構成すべてで回帰テスト成功。左ELFの `satellite_studio_listener` とStudioのBLE・Unlock広告設定を確認。iOra側への広告回避コードは追加していない。
 - 修正前の両側devicetreeでSPI2の競合を再現。修正後はSPI0が有効、SPI2が無効であり、他の有効なpinctrl利用デバイスがセンサーのIRQ・SDIO・RESET・SCK・CS端子を使用しないことを自動検査。ELFにもSPI2用の `spi_nrfx_spi.c` が含まれないことを確認。
 - 旧キーマップと比較し、11コンボのキー位置・出力・有効レイヤー・timeout・slow-releaseが一致。スロット0〜10は重複なし。6レイヤーのキー割り当ては変更なし。
 - 左側の生成設定でRuntime Combo、Studio RPC、16スロットを有効化し、ELFにコンボRPCハンドラーと初期値が含まれることを確認。右側ではRuntime Comboを有効化していない。
