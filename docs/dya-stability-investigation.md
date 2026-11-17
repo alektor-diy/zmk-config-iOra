@@ -1,5 +1,7 @@
 # DYA対応FWのハング調査
 
+この文書はSatelliteを含む開発版で行った調査の履歴。記載の「今回のビルド」は開発版コミット `2601b40` の構成を指す。公開用DYA安定版はこのスタック見直しを継承し、Satelliteの依存・設定を削除している。公開用生成物の情報は [ビルド記録](dya-studio-build.md) を参照。
+
 ## 確認した症状
 
 2026-11-17、ユーザー実機で応答の悪化と完全停止を報告。左右を再起動してから一度もDYA Studioへ接続しなくても発生し、再起動が必要になる。診断ストリーミング中だけの入力停止とは別の問題。
@@ -13,7 +15,7 @@
 - 前版の逆アセンブルでは `peripheral_event_work_callback` のフレームが528バイト、`runtime_combo_listener` が320バイト、`split_central_split_run_callback` が312バイト。これらは個別関数の値であり、実行中は呼び出し先やイベント再送による追加消費がある。これだけで実際のオーバーフローを証明したものではない。
 - 240バイトのsplit relayデータを有効にすると、通常のsplitイベント・コマンドも共通unionのサイズが大きくなる。Studioを使っていない通常入力でもスタック消費に影響する。
 - ZMKの `input_processor_temp_layer.c` はシステムワークキュー上でmutexを保持しながら、空になったactionキューを最大10 ms待つ。センサーのmotion処理もこのワークキューで実行されるため、応答悪化の候補。完全停止の原因としては未確認で、依存ソースへの変更は行っていない。
-- SatelliteのStudio広告との競合はSatellite側の `fix/dya-studio-ble-advertising`（`29bd37c09d1904808e2c2ef81e6c31d3e1f58f34`）で修正し、現在のUF2にはその版を取り込んだ。iOra固有の広告回避処理は追加していない。完全停止とこの競合の因果関係は未確認。
+- 当時のSatelliteのStudio広告との競合はSatellite側の `fix/dya-studio-ble-advertising`（`29bd37c09d1904808e2c2ef81e6c31d3e1f58f34`）で修正し、開発版UF2に取り込んだ。iOra固有の広告回避処理は追加していない。完全停止とこの競合の因果関係は未確認。
 
 ## 今回の切り分け変更
 
