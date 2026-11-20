@@ -22,5 +22,8 @@ manifest:
       url: https://github.com/alektor-diy/zmk-satellite
       revision: main
       path: modules/zmk-satellite
+    - name: zmk-dynamic-keymapper
+      url: https://github.com/alektor-diy/zmk-dynamic-keymapper
+      revision: main
   self:
     path: config
