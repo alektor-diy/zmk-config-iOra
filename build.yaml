@@ -2,8 +2,7 @@
 include:
   - board: seeeduino_xiao_ble
     shield: iora_left
-    snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_BT_CTLR_TX_PWR_PLUS_8=y
+    cmake-args: -DCONFIG_BT_CTLR_TX_PWR_PLUS_8=y
     artifact-name: iOra_L
   - board: seeeduino_xiao_ble
     shield: iora_right
